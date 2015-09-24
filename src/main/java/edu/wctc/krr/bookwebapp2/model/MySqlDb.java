@@ -22,21 +22,24 @@ import java.util.Map;
  *
  * @author Kallie
  */
-public class MySqlDb {
+public class MySqlDb implements DBStrategy{
 
     private Connection conn;
 
+    @Override
     public void openConnection(String driverClass, String url,
             String userName, String password) throws Exception {
         Class.forName(driverClass);
         conn = DriverManager.getConnection(url, userName, password);
     }
 
+    @Override
     public void closeConnection() throws SQLException {
         conn.close();
     }
 
     //column names are strings, the values are a ? so we make them generic objects
+    @Override
     public List<Map<String, Object>> findAllRecords(String tableName) throws Exception {
         List<Map<String, Object>> records = new ArrayList<>();
         String sql = "SELECT * FROM " + tableName;
@@ -69,6 +72,7 @@ public class MySqlDb {
         int updateCount = stmt.executeUpdate(sql);
     }
 
+    @Override
     public void deleteSingleRecordPS(String tableName, String fieldName, Object pkValue) throws Exception {
         String sql = "";
         sql = "DELETE FROM " + tableName + " WHERE " + fieldName + " =?";
@@ -78,6 +82,7 @@ public class MySqlDb {
         int updateCount = stmt.executeUpdate(sql); //don't need the int variable, all you NEED is stmt.executeUpdate(sql)
     }
 
+    @Override
     public int insertRecord(String tableName, List colDescriptors, List colValues) throws Exception {
 
         int recordsUpdated;
@@ -116,6 +121,7 @@ public class MySqlDb {
         return conn.prepareStatement(sqlStmt);
     }
 
+    @Override
     public int updateRecord(String tableName, List colDesc, List colValues, String whereField, Object whereValue) throws Exception {
         PreparedStatement pstmt = null;
         int recordsUpdated = 0;
