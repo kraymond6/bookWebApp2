@@ -20,10 +20,6 @@ public class Author {
     public Author() {
     }
 
-    public Author(int authorId) {
-        this.authorId = authorId;
-    }
-
     public Author(int authorId, String authorName, Date dateAdded) {
         this.authorId = authorId;
         this.authorName = authorName;

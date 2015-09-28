@@ -17,20 +17,20 @@ import java.util.Map;
 public class AuthorDao implements AuthorDaoStrategy {
 
     private DBStrategy db;
-    private String driverClass;
+    private String driver;
     private String url;
     private String userName;
     private String password;
 
     public AuthorDao(DBStrategy db, String driverClass, String url, String userName, String password){
         this.db = db;
-        this.driverClass = driverClass;
+        this.driver = driverClass;
         this.url = url;
         this.userName = userName;
         this.password = password;
     }
     public List<Author> getAllAuthors() throws Exception {
-         db.openConnection(driverClass, url, userName, password);
+         db.openConnection(driver, url, userName, password);
         List<Author> records = new ArrayList<>();
 
         List<Map<String,Object>> rawData = db.findAllRecords("author");
