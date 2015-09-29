@@ -60,7 +60,7 @@ public class MySqlDb implements DBStrategy{
         return records;
     }
 
-    public void deleteSingleRecord(String tableName, String fieldName, Object pkValue) throws Exception {
+    public int deleteSingleRecord(String tableName, String fieldName, Object pkValue) throws Exception {
         //check for string, use proper where statement
         String sql = "";
         if (pkValue instanceof String) {
@@ -70,16 +70,18 @@ public class MySqlDb implements DBStrategy{
         }
         Statement stmt = conn.createStatement();
         int updateCount = stmt.executeUpdate(sql);
+        return updateCount;
     }
 
     @Override
-    public void deleteSingleRecordPS(String tableName, String fieldName, Object pkValue) throws Exception {
+    public int deleteSingleRecordPS(String tableName, String fieldName, Object pkValue) throws Exception {
         String sql = "";
         sql = "DELETE FROM " + tableName + " WHERE " + fieldName + " =?";
 
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setObject(1, pkValue);
         int updateCount = stmt.executeUpdate(sql); //don't need the int variable, all you NEED is stmt.executeUpdate(sql)
+        return updateCount;
     }
 
     @Override

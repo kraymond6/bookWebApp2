@@ -22,9 +22,9 @@ public class AuthorDao implements AuthorDaoStrategy {
     private String userName;
     private String password;
 
-    public AuthorDao(DBStrategy db, String driverClass, String url, String userName, String password){
+    public AuthorDao(DBStrategy db, String driver, String url, String userName, String password){
         this.db = db;
-        this.driver = driverClass;
+        this.driver = driver;
         this.url = url;
         this.userName = userName;
         this.password = password;
