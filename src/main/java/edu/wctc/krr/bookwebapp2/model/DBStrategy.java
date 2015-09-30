@@ -20,11 +20,12 @@ public interface DBStrategy {
     int deleteSingleRecordPS(String tableName, String fieldName, Object pkValue) throws Exception;
 
     List<Map<String, Object>> findAllRecords(String tableName) throws Exception;
-
+    
     int insertRecord(String tableName, List colDescriptors, List colValues) throws Exception;
 
     void openConnection(String driverClass, String url, String userName, String password) throws Exception;
 
     int updateRecord(String tableName, List colDesc, List colValues, String whereField, Object whereValue) throws Exception;
     
+    Map<String, Object> findById(String tableName, String primaryKeyFieldName, Object primaryKeyValue) throws SQLException;
 }

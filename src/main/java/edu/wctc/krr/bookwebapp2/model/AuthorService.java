@@ -22,5 +22,13 @@ public class AuthorService {
     public final List<Author> getAllAuthors() throws Exception {
         return dao.getAllAuthors();
     }
+    
+    public final Author getAuthorById(String authorId) throws Exception{
+        return dao.getAuthorById(Integer.parseInt(authorId));
+    }
+    
+    public final void deleteAuthorById(String authorId) throws Exception{
+        dao.deleteAuthorById(Integer.parseInt(authorId));
+    }
 }
     

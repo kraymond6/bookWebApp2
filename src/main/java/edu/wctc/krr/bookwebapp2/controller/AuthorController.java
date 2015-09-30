@@ -8,23 +8,24 @@ import edu.wctc.krr.bookwebapp2.model.AuthorService;
 import edu.wctc.krr.bookwebapp2.model.DBStrategy;
 import edu.wctc.krr.bookwebapp2.model.MySqlDb;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.List;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
 
 /**
  * The main controller for author-related activities
  *
  * @author jlombardo
  */
-@WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
+//@WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
 public class AuthorController extends HttpServlet {
 
     // NO MAGIC NUMBERS!
@@ -33,10 +34,18 @@ public class AuthorController extends HttpServlet {
     private static final String LIST_PAGE = "/listAuthors.jsp";
     private static final String LIST_ACTION = "list";
     private static final String ADD_ACTION = "add";
+    private static final String UPDATE_PAGE = "/update.jsp";
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
 
+    private String driver;
+    private String url;
+    private String userName;
+    private String password;
+    private String dbStrategyClassName;
+    private String daoClassName;
+    private DBStrategy db;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -50,17 +59,18 @@ public class AuthorController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
+        //sample code for getting info from web xml file
+        String dbClassName= this.getServletContext().getInitParameter("dbStrategy");
+        try{
+         Class c = Class.forName(dbClassName);
+         DBStrategy db = (DBStrategy)c.newInstance();
+        }catch(Exception e){
+        }
+         
         String destination = LIST_PAGE;
         //In index.html action refers to the querystring parameter
         String action = request.getParameter(ACTION_PARAM);
 
-        /*
-         For now we are hard-coding the strategy objects into this
-         controller. In the future we'll auto inject them from a config
-         file. Also, the DAO opens/closes a connection on each method call,
-         which is not very efficient. In the future we'll learn how to use
-         a connection pool to improve this.
-         */
         DBStrategy db = new MySqlDb();
         AuthorDaoStrategy authDao
                 = new AuthorDao(db, "com.mysql.jdbc.Driver",
@@ -68,18 +78,6 @@ public class AuthorController extends HttpServlet {
         AuthorService authService = new AuthorService(authDao);
 
         try {
-            /*
-             Here's what the connection pool version looks like.
-             */
-//            Context ctx = new InitialContext();
-//            DataSource ds = (DataSource)ctx.lookup("jdbc/book");
-//            AuthorDaoStrategy authDao = new ConnPoolAuthorDao(ds, new MySqlDbStrategy());
-//            AuthorService authService = new AuthorService(authDao);
-
-            /*
-             Determine what action to take based on a passed in QueryString
-             Parameter
-             */
             if (action.equals(LIST_ACTION)) {
                 //empty list to store results
                 List<Author> authors = null;
@@ -88,12 +86,21 @@ public class AuthorController extends HttpServlet {
                 request.setAttribute("authors", authors);
                 destination = LIST_PAGE;
 
-            } else if (action.equals("ADD_ACTION")) {
-                // coming soon
-            } else if (action.equals("UPDATE_ACTION")) {
-                // coming soon
-            } else if (action.equals("DELETE_ACTION")) {
-                // coming soon
+            } else if (action.equals(ADD_ACTION)) {
+                destination = UPDATE_PAGE;
+            } else if (action.equals(UPDATE_ACTION)) {
+                
+                String authorId = request.getParameter("authorId");
+                Author author = authService.getAuthorById(authorId);
+                request.setAttribute("author", author);
+                destination = UPDATE_PAGE;
+                
+            } else if (action.equals(DELETE_ACTION)) {
+                String[] authorIds = request.getParameterValues("authorId");
+                for (String id : authorIds){
+                    authService.deleteAuthorById(id);
+                }
+                destination = LIST_PAGE;
             } else {
                 // no param identified in request, must be an error
                 request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
@@ -108,6 +115,15 @@ public class AuthorController extends HttpServlet {
         RequestDispatcher dispatcher
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
+    }
+    
+    public void init() throws ServletException{
+        driver = getServletConfig().getInitParameter("driver");
+        url = getServletConfig().getInitParameter("url");
+        userName = getServletConfig().getInitParameter("userName");
+        password = getServletConfig().getInitParameter("password");
+        dbStrategyClassName = getServletConfig().getInitParameter("dbStrategy");
+        daoClassName = getServletConfig().getInitParameter("authorDao");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

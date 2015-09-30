@@ -53,4 +53,23 @@ public class AuthorDao implements AuthorDaoStrategy {
         
         return records;
     }
+    
+    @Override
+    public final Author getAuthorById(Integer authorId) throws Exception {
+        db.openConnection(driver, url, userName, password);
+        
+        Map<String,Object> rawRec = db.findById("author", "authorId", authorId);
+        Author author = new Author();
+        author.setAuthorId((Integer)rawRec.get("author_id"));
+        author.setAuthorName(rawRec.get("author_name").toString());
+        author.setDateAdded((Date)rawRec.get("date_added"));
+        
+        return author;
+    }
+    
+    @Override
+    public final void deleteAuthorById(Integer authorId) throws Exception{
+        db.openConnection(driver, url, userName, password);
+        db.deleteSingleRecordPS("author", "author_id", authorId);
+    }
 }

@@ -14,4 +14,8 @@ import java.util.List;
 public interface AuthorDaoStrategy {
 
     List<Author> getAllAuthors() throws Exception;
+    
+     Author getAuthorById(Integer authorId) throws Exception;
+     
+     void deleteAuthorById(Integer authorId) throws Exception;
 }
