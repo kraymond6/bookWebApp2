@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-
 /**
  * The main controller for author-related activities
  *
@@ -29,7 +28,6 @@ import javax.sql.DataSource;
 public class AuthorController extends HttpServlet {
 
     // NO MAGIC NUMBERS!
-
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
     private static final String LIST_PAGE = "/listAuthors.jsp";
     private static final String LIST_ACTION = "list";
@@ -43,9 +41,10 @@ public class AuthorController extends HttpServlet {
     private String url;
     private String userName;
     private String password;
-    private String dbStrategyClassName;
+    private String dbClassName;
     private String daoClassName;
     private DBStrategy db;
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -55,29 +54,40 @@ public class AuthorController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    private AuthorService injectDependenciesGetAuthorService() throws Exception {
+        AuthorDaoStrategy authorDao = null;
+
+
+            Class dbClass = Class.forName(dbClassName);
+            DBStrategy db = (DBStrategy) dbClass.newInstance();
+
+            Class daoClass = Class.forName(daoClassName);
+            Constructor constructor = null;
+            constructor = daoClass.getConstructor(new Class[]{DBStrategy.class, String.class, String.class, String.class, String.class});
+            Object[] constructorArgs = new Object[]{db, driver, url, userName, password};
+            authorDao = (AuthorDaoStrategy) constructor.newInstance(constructorArgs);
+ 
+        return new AuthorService(authorDao);
+    }
+
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) 
+    throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-
+            String destination = LIST_PAGE;
+            String action = request.getParameter(ACTION_PARAM);
         //sample code for getting info from web xml file
-        String dbClassName= this.getServletContext().getInitParameter("dbStrategy");
-        try{
-         Class c = Class.forName(dbClassName);
-         DBStrategy db = (DBStrategy)c.newInstance();
-        }catch(Exception e){
-        }
-         
-        String destination = LIST_PAGE;
-        //In index.html action refers to the querystring parameter
-        String action = request.getParameter(ACTION_PARAM);
-
-        DBStrategy db = new MySqlDb();
-        AuthorDaoStrategy authDao
-                = new AuthorDao(db, "com.mysql.jdbc.Driver",
-                        "jdbc:mysql://localhost:3306/book", "root", "admin");
-        AuthorService authService = new AuthorService(authDao);
-
         try {
+            AuthorService authService = injectDependenciesGetAuthorService();
+
+            //In index.html action refers to the querystring parameter
+            
+
+            //This was my instantiation code, now to change to web xml injection
+//        DBStrategy db = new MySqlDb();
+//        AuthorDaoStrategy authDao
+//                = new AuthorDao(db, "com.mysql.jdbc.Driver",
+//                        "jdbc:mysql://localhost:3306/book", "root", "admin");
+//        AuthorService authService = new AuthorService(authDao);
             if (action.equals(LIST_ACTION)) {
                 //empty list to store results
                 List<Author> authors = null;
@@ -89,15 +99,15 @@ public class AuthorController extends HttpServlet {
             } else if (action.equals(ADD_ACTION)) {
                 destination = UPDATE_PAGE;
             } else if (action.equals(UPDATE_ACTION)) {
-                
+
                 String authorId = request.getParameter("authorId");
                 Author author = authService.getAuthorById(authorId);
                 request.setAttribute("author", author);
                 destination = UPDATE_PAGE;
-                
+
             } else if (action.equals(DELETE_ACTION)) {
                 String[] authorIds = request.getParameterValues("authorId");
-                for (String id : authorIds){
+                for (String id : authorIds) {
                     authService.deleteAuthorById(id);
                 }
                 destination = LIST_PAGE;
@@ -106,23 +116,24 @@ public class AuthorController extends HttpServlet {
                 request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
                 destination = LIST_PAGE;
             }
-            
+
         } catch (Exception e) {
             request.setAttribute("errMsg", e.getCause().getMessage());
         }
-
+        
         // Forward to destination page
         RequestDispatcher dispatcher
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
+
     }
-    
-    public void init() throws ServletException{
+
+    public void init() throws ServletException {
         driver = getServletConfig().getInitParameter("driver");
         url = getServletConfig().getInitParameter("url");
         userName = getServletConfig().getInitParameter("userName");
         password = getServletConfig().getInitParameter("password");
-        dbStrategyClassName = getServletConfig().getInitParameter("dbStrategy");
+        dbClassName = getServletConfig().getInitParameter("dbStrategy");
         daoClassName = getServletConfig().getInitParameter("authorDao");
     }
 

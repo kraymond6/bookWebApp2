@@ -24,6 +24,7 @@
                 <th align="left" class="tableHead">ID</th>
                 <th align="left" class="tableHead">Author Name</th>
                 <th align="right" class="tableHead">Date Added</th>
+                <th align="right" colspan="2" class="tableHead">Action</th>
             </tr>
         <c:forEach var="a" items="${authors}" varStatus="rowCount">
             <c:choose>
@@ -38,7 +39,8 @@
             <td align="left">${a.authorName}</td>
             <td align="right">
                 <fmt:formatDate pattern="M/d/yyyy" value="${a.dateAdded}"></fmt:formatDate>
-            </td>
+            <td><a href="AuthorController?action=update&authorId=${a.authorId}">Edit</a></td>
+            <td><a href="AuthorController?action=delete&authorId=${a.authorId}">Delete</a></td>
         </tr>
         </c:forEach>
         </table>

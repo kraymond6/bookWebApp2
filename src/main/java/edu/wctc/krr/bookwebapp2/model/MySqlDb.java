@@ -212,11 +212,11 @@ private PreparedStatement buildUpdateStmt(Connection conn, String tableName, Lis
     }
    
     //testing purposes only, normally do this in another class
-    public static void main(String[] args) throws Exception{
-        MySqlDb db = new MySqlDb();
-        db.openConnection("com.mysql.jdbc.Driver",
-                "jdbc:mysql://localhost:3306/book",
-                "root", "admin");
+//    public static void main(String[] args) throws Exception{
+//        MySqlDb db = new MySqlDb();
+//        db.openConnection("com.mysql.jdbc.Driver",
+//                "jdbc:mysql://localhost:3306/book",
+//                "root", "admin");
         //db.deleteSingleRecord("author", "author_id", 3);
         
         //INSERT INTO table_name (col1, col2) VALUES (val1, val2)
@@ -231,10 +231,10 @@ private PreparedStatement buildUpdateStmt(Connection conn, String tableName, Lis
 //        colValues.add("2015-09-23");
 //        
 //        db.insertRecord("book.author", colDesc, colValues);
-        List<Map<String,Object>> records = db.findAllRecords("author");
-        for(Map record : records) {
-            System.out.println(record);
-        }
-        db.closeConnection();
-    }
+//        List<Map<String,Object>> records = db.findAllRecords("author");
+//        for(Map record : records) {
+//            System.out.println(record);
+//        }
+//        db.closeConnection();
+//    }
 }

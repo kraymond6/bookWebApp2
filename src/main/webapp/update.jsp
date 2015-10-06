@@ -12,28 +12,28 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Add</title>
+        <title>Update</title>
     </head>
     <body>
         <form method="POST" action="AuthorController">
             <table>
                 <c:choose>
-                    <c:when test="${author}">
+                    <c:when test="${not empty author}">
                         <tr>
                             <td>ID</td>
-                            <td><input type="text" value="${author.authorId}" name="authorId" readonly/>
+                            <td><input type="text" value="${author.authorId}" name="authorId"/>
                         </tr>
                     </c:when>
                 </c:choose>
                         <tr>
                             <td>Name</td>
-                            <td><input type="text" value="${author.authorName}" name="authorName" readonly/></td>
+                            <td><input type="text" value="${author.authorName}" name="authorName"/></td>
                         </tr>
                         <c:choose>
-                            <c:when test="${author}">
+                            <c:when test="${not empty author}">
                                 <tr>
                                     <td>Date added</td>
-                                    <td><input type="text" value="${author.dateAdded}" name="dateAdded" readonly/>
+                                    <td><input type="text" value="${author.dateAdded}" name="dateAdded"/>
                                 </tr>
                             </c:when>
                         </c:choose>

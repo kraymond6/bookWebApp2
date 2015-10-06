@@ -18,4 +18,6 @@ public interface AuthorDaoStrategy {
      Author getAuthorById(Integer authorId) throws Exception;
      
      void deleteAuthorById(Integer authorId) throws Exception;
+     
+     void saveAuthor(Integer authorId, String authorName) throws Exception;
 }

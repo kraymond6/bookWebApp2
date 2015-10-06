@@ -34,12 +34,10 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <!-- reference private config alias -->
         <servlet-name>AuthorController</servlet-name>
-        <!-- second alias is the one you use in your links -->
         <url-pattern>/AuthorController</url-pattern>
     </servlet-mapping>
-</servlet>
+
 <session-config>
     <session-timeout>
         30

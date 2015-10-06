@@ -6,6 +6,7 @@
 package edu.wctc.krr.bookwebapp2.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class AuthorDao implements AuthorDaoStrategy {
     public final Author getAuthorById(Integer authorId) throws Exception {
         db.openConnection(driver, url, userName, password);
         
-        Map<String,Object> rawRec = db.findById("author", "authorId", authorId);
+        Map<String,Object> rawRec = db.findById("author", "author_id", authorId);
         Author author = new Author();
         author.setAuthorId((Integer)rawRec.get("author_id"));
         author.setAuthorName(rawRec.get("author_name").toString());
@@ -71,5 +72,16 @@ public class AuthorDao implements AuthorDaoStrategy {
     public final void deleteAuthorById(Integer authorId) throws Exception{
         db.openConnection(driver, url, userName, password);
         db.deleteSingleRecordPS("author", "author_id", authorId);
+    }
+    
+   @Override
+    public void saveAuthor(Integer authorId, String authorName) throws Exception{
+        db.openConnection(driver, url, userName, password);
+        if(authorId == null || authorId.equals(0)){
+            db.insertRecord("author", Arrays.asList("author_name","date_added"), Arrays.asList(authorName, new Date()));
+        } else {
+            db.updateRecord("author", Arrays.asList("author_name"), Arrays.asList(authorName), "author_id", authorId);
+        }
+        
     }
 }
