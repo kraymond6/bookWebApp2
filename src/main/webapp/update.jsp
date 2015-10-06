@@ -38,7 +38,7 @@
                             </c:when>
                         </c:choose>
                                 <tr>
-                                    <input type="submit" value="Save" name="action"/>
+                                    <input type="submit" value="save" name="action"/>
                                 </tr>
             </table>
         </form>

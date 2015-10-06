@@ -36,6 +36,7 @@ public class AuthorController extends HttpServlet {
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
+    private static final String SAVE_ACTION = "save";
 
     private String driver;
     private String url;
@@ -111,6 +112,11 @@ public class AuthorController extends HttpServlet {
                     authService.deleteAuthorById(id);
                 }
                 destination = LIST_PAGE;
+            } else if (action.equals(SAVE_ACTION)){
+               String authorName = request.getParameter("authorName");
+               String authorId = request.getParameter("authorId");
+               authService.saveAuthor(authorId, authorName);
+               
             } else {
                 // no param identified in request, must be an error
                 request.setAttribute("errMsg", NO_PARAM_ERR_MSG);

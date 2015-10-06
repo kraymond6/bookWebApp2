@@ -30,5 +30,15 @@ public class AuthorService {
     public final void deleteAuthorById(String authorId) throws Exception{
         dao.deleteAuthorById(Integer.parseInt(authorId));
     }
+    
+    public final void saveAuthor(String authorId, String authorName) throws Exception{
+        Integer id = null;
+        if(authorId == null || authorId.isEmpty()){
+            id = null;
+        } else {
+            id = Integer.parseInt(authorId);
+        }
+        dao.saveAuthor(id, authorName);
+    }
 }
     
