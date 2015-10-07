@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
 /**
  *
@@ -26,13 +27,17 @@ public class MySqlDb implements DBStrategy {
 
     private Connection conn;
 
-    @Override
-    public void openConnection(String driverClass, String url,
-            String userName, String password) throws Exception {
-        Class.forName(driverClass);
-        conn = DriverManager.getConnection(url, userName, password);
-    }
+//    @Override
+//    public void openConnection(String driverClass, String url,
+//            String userName, String password) throws Exception {
+//        Class.forName(driverClass);
+//        conn = DriverManager.getConnection(url, userName, password);
+//    }
 
+    @Override
+    public void openConnection(DataSource ds) throws Exception{
+        conn = ds.getConnection();
+    }
     @Override
     public void closeConnection() throws SQLException {
         conn.close();

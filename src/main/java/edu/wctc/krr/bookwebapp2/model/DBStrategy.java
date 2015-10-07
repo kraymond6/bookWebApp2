@@ -8,6 +8,7 @@ package edu.wctc.krr.bookwebapp2.model;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
 /**
  *
@@ -23,7 +24,7 @@ public interface DBStrategy {
     
     int insertRecord(String tableName, List colDescriptors, List colValues) throws Exception;
 
-    void openConnection(String driverClass, String url, String userName, String password) throws Exception;
+    void openConnection(DataSource ds) throws Exception;
 
     int updateRecord(String tableName, List colDesc, List colValues, String whereField, Object whereValue) throws Exception;
     
