@@ -22,7 +22,7 @@ import java.util.Map;
  *
  * @author Kallie
  */
-public class MySqlDb implements DBStrategy{
+public class MySqlDb implements DBStrategy {
 
     private Connection conn;
 
@@ -60,7 +60,7 @@ public class MySqlDb implements DBStrategy{
         return records;
     }
 
-     public final Map<String, Object> findById(String tableName, String primaryKeyFieldName,
+    public final Map<String, Object> findById(String tableName, String primaryKeyFieldName,
             Object primaryKeyValue) throws SQLException {
 
         String sql = "SELECT * FROM " + tableName + " WHERE " + primaryKeyFieldName + " = ?";
@@ -81,7 +81,7 @@ public class MySqlDb implements DBStrategy{
                     record.put(metaData.getColumnName(i), rs.getObject(i));
                 }
             }
-            
+
         } catch (Exception e) {
             throw e;
         } finally {
@@ -95,6 +95,7 @@ public class MySqlDb implements DBStrategy{
 
         return record;
     }
+
     public int deleteSingleRecord(String tableName, String fieldName, Object pkValue) throws Exception {
         //check for string, use proper where statement
         String sql = "";
@@ -162,64 +163,57 @@ public class MySqlDb implements DBStrategy{
     public int updateRecord(String tableName, List colDesc, List colValues, String whereField, Object whereValue) throws Exception {
         PreparedStatement pstmt = null;
         int recordsUpdated = 0;
-
-        try {
+        try{
             pstmt = buildUpdateStmt(conn, tableName, colDesc, whereField);
-
-            final Iterator x = colValues.iterator();
+            
+            final Iterator i = colValues.iterator();
             int index = 1;
-            boolean whereFlag = false;
             Object obj = null;
-            while (x.hasNext() || whereFlag) {
-                if (!whereFlag) {
-                    obj = x.next();
-                }
-                if (obj != null) {
-                    pstmt.setObject(index++, obj);
-                }
-                if (whereFlag) {
-                    break;
-                }
-                if(!x.hasNext()){
-                    whereFlag = true;
-                    obj = whereValue;
+            
+            //set parameters for column values
+            while (i.hasNext()){
+                obj = i.next();
+                pstmt.setObject(index++, obj);
             }
-                recordsUpdated = pstmt.executeUpdate();
-        }
-    } catch(Exception e){
-        throw e;
-    } finally {
+            //set parameter for where value
+            pstmt.setObject(index, whereValue);
+            recordsUpdated = pstmt.executeUpdate();
+        } catch (SQLException sqle){
+            throw sqle;
+        } catch (Exception e){
+            throw e;
+        } finally {
             try{
-            pstmt.close();
-            } catch(SQLException ex){
-                throw ex;
+                pstmt.close();
+                conn.close();
+            } catch (SQLException e){
+                throw e;
             }
         }
         return recordsUpdated;
-}
+    }
 
-private PreparedStatement buildUpdateStmt(Connection conn, String tableName, List colDescriptors, String whereField) throws Exception{
+    private PreparedStatement buildUpdateStmt(Connection conn, String tableName, List colDescriptors, String whereField) throws Exception {
         StringBuffer stmt = new StringBuffer("UPDATE ");
         (stmt.append(tableName)).append(" SET ");
-        final Iterator x=colDescriptors.iterator();
-        while(x.hasNext()){
-            (stmt.append((String)x.next())).append(" = ?, ");
+        final Iterator i = colDescriptors.iterator();
+        while (i.hasNext()) {
+            (stmt.append((String) i.next())).append(" = ?, ");
         }
-        stmt = new StringBuffer((stmt.toString()).substring(0,(stmt.toString()).lastIndexOf(", ")));
+        stmt = new StringBuffer((stmt.toString()).substring(0, (stmt.toString()).lastIndexOf(", ")));
         ((stmt.append(" WHERE ")).append(whereField)).append(" =?");
         String statement = stmt.toString();
         return conn.prepareStatement(statement);
     }
-   
+
     //testing purposes only, normally do this in another class
 //    public static void main(String[] args) throws Exception{
 //        MySqlDb db = new MySqlDb();
 //        db.openConnection("com.mysql.jdbc.Driver",
 //                "jdbc:mysql://localhost:3306/book",
 //                "root", "admin");
-        //db.deleteSingleRecord("author", "author_id", 3);
-        
-        //INSERT INTO table_name (col1, col2) VALUES (val1, val2)
+    //db.deleteSingleRecord("author", "author_id", 3);
+    //INSERT INTO table_name (col1, col2) VALUES (val1, val2)
 //        List colDesc = new ArrayList<>();
 //        colDesc.add("author_id");
 //        colDesc.add("author_name");

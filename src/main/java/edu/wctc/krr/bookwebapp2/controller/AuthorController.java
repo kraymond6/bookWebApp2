@@ -116,7 +116,8 @@ public class AuthorController extends HttpServlet {
                String authorName = request.getParameter("authorName");
                String authorId = request.getParameter("authorId");
                authService.saveAuthor(authorId, authorName);
-               
+               this.refresh(request, authService);
+               destination = LIST_PAGE;
             } else {
                 // no param identified in request, must be an error
                 request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
@@ -134,6 +135,10 @@ public class AuthorController extends HttpServlet {
 
     }
 
+    private void refresh(HttpServletRequest request, AuthorService authService) throws Exception {
+        List<Author> authors = authService.getAllAuthors();
+        request.setAttribute("authors", authors);
+    }
     public void init() throws ServletException {
         driver = getServletConfig().getInitParameter("driver");
         url = getServletConfig().getInitParameter("url");
