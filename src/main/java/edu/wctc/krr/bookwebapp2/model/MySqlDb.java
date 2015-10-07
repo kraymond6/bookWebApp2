@@ -110,40 +110,57 @@ public class MySqlDb implements DBStrategy {
     }
 
     @Override
-    public int deleteSingleRecordPS(String tableName, String fieldName, Object pkValue) throws Exception {
-        String sql = "";
-        sql = "DELETE FROM " + tableName + " WHERE " + fieldName + " =?";
+    public void deleteSingleRecordPS(String tableName, String fieldName, Object pkValue) throws SQLException {
+        String sql = "DELETE FROM " + tableName + " WHERE " + fieldName + " =?";
 
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setObject(1, pkValue);
-        int updateCount = stmt.executeUpdate(sql); //don't need the int variable, all you NEED is stmt.executeUpdate(sql)
-        return updateCount;
+        PreparedStatement stmt = null;
+        try {
+            conn.prepareStatement(sql);
+            stmt.setObject(1, pkValue);
+            stmt.executeUpdate(); 
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            try {
+                stmt.close();
+                conn.close();
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
     }
 
     @Override
-    public int insertRecord(String tableName, List colDescriptors, List colValues) throws Exception {
-
-        int recordsUpdated;
+    public int insertRecord(String tableName, List colDescriptors, List colValues) throws SQLException, Exception {
         PreparedStatement pstmt = null;
+        int recordsUpdated = 0;
         try {
             pstmt = buildInsertStmt(conn, tableName, colDescriptors);
 
             final Iterator i = colValues.iterator();
             int index = 1;
             while (i.hasNext()) {
-                Object obj = i.next();
+                final Object obj = i.next();
                 pstmt.setObject(index++, obj);
             }
+            //this is where it breaks
             recordsUpdated = pstmt.executeUpdate();
         } catch (SQLException sqle) {
             throw sqle;
         } catch (Exception e) {
             throw e;
+        } finally {
+            try {
+                pstmt.close();
+                conn.close();
+            } catch (SQLException e) {
+                throw e;
+            }
         }
         return recordsUpdated;
     }
 
-    private PreparedStatement buildInsertStmt(Connection conn, String tableName, List colDescriptors) throws Exception {
+    private PreparedStatement buildInsertStmt(Connection conn, String tableName, List colDescriptors) throws SQLException {
         //INSERT INTO table_name (col1, col2) VALUES (val1, val2)
         StringBuffer sql = new StringBuffer("INSERT INTO ");
         (sql.append(tableName)).append(" (");
@@ -152,10 +169,10 @@ public class MySqlDb implements DBStrategy {
             (sql.append((String) i.next())).append(", ");
         }
         sql = new StringBuffer((sql.toString()).substring(0, (sql.toString()).lastIndexOf(", ")) + ") VALUES (");
-        for (Object colDescriptor : colDescriptors) {
+        for (int x = 0; x < colDescriptors.size(); x++) {
             sql.append("?, ");
         }
-        String sqlStmt = (sql.toString()).substring(0, (sql.toString()).lastIndexOf(", ")) + ")";
+        final String sqlStmt = (sql.toString()).substring(0, (sql.toString()).lastIndexOf(", ")) + ")";
         return conn.prepareStatement(sqlStmt);
     }
 
@@ -163,30 +180,30 @@ public class MySqlDb implements DBStrategy {
     public int updateRecord(String tableName, List colDesc, List colValues, String whereField, Object whereValue) throws Exception {
         PreparedStatement pstmt = null;
         int recordsUpdated = 0;
-        try{
+        try {
             pstmt = buildUpdateStmt(conn, tableName, colDesc, whereField);
-            
+
             final Iterator i = colValues.iterator();
             int index = 1;
             Object obj = null;
-            
+
             //set parameters for column values
-            while (i.hasNext()){
+            while (i.hasNext()) {
                 obj = i.next();
                 pstmt.setObject(index++, obj);
             }
             //set parameter for where value
             pstmt.setObject(index, whereValue);
             recordsUpdated = pstmt.executeUpdate();
-        } catch (SQLException sqle){
+        } catch (SQLException sqle) {
             throw sqle;
-        } catch (Exception e){
+        } catch (Exception e) {
             throw e;
         } finally {
-            try{
+            try {
                 pstmt.close();
                 conn.close();
-            } catch (SQLException e){
+            } catch (SQLException e) {
                 throw e;
             }
         }

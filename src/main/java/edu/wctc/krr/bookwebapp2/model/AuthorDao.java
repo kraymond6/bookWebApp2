@@ -5,6 +5,7 @@
  */
 package edu.wctc.krr.bookwebapp2.model;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -78,7 +79,9 @@ public class AuthorDao implements AuthorDaoStrategy {
     public void saveAuthor(Integer authorId, String authorName) throws Exception{
         db.openConnection(driver, url, userName, password);
         if(authorId == null || authorId.equals(0)){
-            db.insertRecord("author", Arrays.asList("author_name","date_added"), Arrays.asList(authorName, new Date()));
+            SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
+            Date formattedDate = sdf.parse(sdf.format(new Date()));
+            db.insertRecord("author", Arrays.asList("author_name","date_added"), Arrays.asList(authorName, formattedDate));
         } else {
             db.updateRecord("author", Arrays.asList("author_name"), Arrays.asList(authorName), "author_id", authorId);
         }

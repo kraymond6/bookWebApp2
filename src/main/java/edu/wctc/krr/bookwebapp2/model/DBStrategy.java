@@ -17,7 +17,7 @@ public interface DBStrategy {
 
     void closeConnection() throws SQLException;
 
-    int deleteSingleRecordPS(String tableName, String fieldName, Object pkValue) throws Exception;
+    void deleteSingleRecordPS(String tableName, String fieldName, Object pkValue) throws Exception;
 
     List<Map<String, Object>> findAllRecords(String tableName) throws Exception;
     
