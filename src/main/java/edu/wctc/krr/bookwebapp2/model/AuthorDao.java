@@ -64,7 +64,7 @@ public class AuthorDao implements AuthorDaoStrategy {
         Author author = new Author();
         author.setAuthorId((Integer)rawRec.get("author_id"));
         author.setAuthorName(rawRec.get("author_name").toString());
-        author.setDateAdded((Date)rawRec.get("date_added"));
+        author.setDateAdded((Date)rawRec.get("date_created"));
         
         return author;
     }
@@ -79,12 +79,11 @@ public class AuthorDao implements AuthorDaoStrategy {
     public void saveAuthor(Integer authorId, String authorName) throws Exception{
         db.openConnection(driver, url, userName, password);
         if(authorId == null || authorId.equals(0)){
-            SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
-            Date formattedDate = sdf.parse(sdf.format(new Date()));
-            db.insertRecord("author", Arrays.asList("author_name","date_added"), Arrays.asList(authorName, formattedDate));
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+//            Date formattedDate = sdf.parse(sdf.format(new Date()));
+            db.insertRecord("author", Arrays.asList("author_name","date_created"), Arrays.asList(authorName, new Date()));
         } else {
             db.updateRecord("author", Arrays.asList("author_name"), Arrays.asList(authorName), "author_id", authorId);
         }
-        
     }
 }

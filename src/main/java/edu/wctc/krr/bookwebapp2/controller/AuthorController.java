@@ -109,6 +109,7 @@ public class AuthorController extends HttpServlet {
             } else if (action.equals(DELETE_ACTION)) {
                 String authorId = request.getParameter("authorId");
                 authService.deleteAuthorById(authorId);
+                this.refresh(request, authService);
                 destination = LIST_PAGE;
             } else if (action.equals(SAVE_ACTION)){
                String authorName = request.getParameter("authorName");
